@@ -1,34 +1,68 @@
+import argparse
+import pprint
+import os
 
-def get_text():
-    with open('/home/blackcat/DevSpace/github.com/3lackC4t/bookbot/books/frankenstein.txt', 'r') as f:
-        file_contents = f.read()
-        return file_contents
 
-def word_count():
-    word_list = get_text().split()
-    print(len(word_list))
+class BookBot:
+    def __init__(self, path = '', text = ''):
+        self.path = os.path.abspath(path)
+        with open(self.path, 'r') as f:
+            self.text = f.read()
 
-def character_count():
-    char_dict = {}
-    char_count_list = []
-    text_str = get_text().lower()
+    def set_path(self, new_path) -> None:
+        self.path = os.path.abspath(new_path)
 
-    def sort_on(dict):
-        return dict["num"]
+    def get_path(self) -> str:
+        return self.path
 
-    for char in text_str:
-        if char in char_dict and char.isalnum():
-            char_dict[char] += 1
-        if char not in char_dict and char.isalnum():
-            char_dict[char] = 1
+    def word_count(self) -> int:
+        word_list = self.text.split()
+        return len(word_list)
 
-    for key in char_dict:
-        new_dict = {"char": key, "num": char_dict[key]}
-        char_count_list.append(new_dict)
+    def character_count(self) -> list[dict]:
+        char_dict = {}
+        char_count_list = []
+        text_str = self.text.lower() 
 
-    _sorted = sorted(char_count_list, reverse=True, key=sort_on)
-    return _sorted
-    
+        def sort_on(dict):
+            return dict["num"]
+
+        for char in text_str:
+            if char in char_dict and char.isalnum():
+                char_dict[char] += 1
+            if char not in char_dict and char.isalnum():
+                char_dict[char] = 1
+
+        for key in char_dict:
+            new_dict = {"char": key, "num": char_dict[key]}
+            char_count_list.append(new_dict)
+
+        _sorted = sorted(char_count_list, reverse=True, key=sort_on)
+        return _sorted
+
+    def print_form(self):
+        print(f"--- Begin report of {self.path} ---")
+        print(f"{self.word_count} words in this document")
+        print("\n\n")
+        for char_dict in self.character_count():
+            print(f"The {char_dict["char"]} character was found {char_dict["num"]} times")
+
+        print("--- End report ---")
+
+def build_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('path', 
+                        type=str, 
+                        action='store',
+                        help='the path to the text file you will be using')
+
+    args = parser.parse_args()
+    return args
+
+def main():
+    args = build_parser()
+    new_book = BookBot(args.path)
+    new_book.print_form()
 
 if __name__ == "__main__":
-    print(character_count())
+    main()
