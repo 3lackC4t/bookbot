@@ -1,27 +1,34 @@
-import re
 
-def main():
+def get_text():
     with open('/home/blackcat/DevSpace/github.com/3lackC4t/bookbot/books/frankenstein.txt', 'r') as f:
         file_contents = f.read()
         return file_contents
 
 def word_count():
-    word_list = main().split()
+    word_list = get_text().split()
     print(len(word_list))
 
 def character_count():
-    character_hash = {}
-    for char in list(main().lower()):
-        if char in character_hash and char != " ":
-            character_hash[char] += 1
-        else:
-            character_hash[char] = 1
+    char_dict = {}
+    char_count_list = []
+    text_str = get_text().lower()
+
+    def sort_on(dict):
+        return dict["num"]
+
+    for char in text_str:
+        if char in char_dict and char.isalnum():
+            char_dict[char] += 1
+        if char not in char_dict and char.isalnum():
+            char_dict[char] = 1
+
+    for key in char_dict:
+        new_dict = {"char": key, "num": char_dict[key]}
+        char_count_list.append(new_dict)
+
+    _sorted = sorted(char_count_list, reverse=True, key=sort_on)
+    return _sorted
     
-    return character_hash
-
-
 
 if __name__ == "__main__":
-    char_hash = character_count()
-    for char in char_hash:
-        print(f"{char}: {char_hash[char]}")
+    print(character_count())
